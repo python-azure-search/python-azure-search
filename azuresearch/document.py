@@ -21,7 +21,7 @@ class Documents(object):
                 docs.append(doc)
 
         data = {'value': docs}
-        return self.index.endpoint.post(endpoint=self.index.name+"/docs/index", data=data)
+        return self.index.endpoint.post(endpoint=self.index.name+"/docs/index", data=data, needs_admin=True)
 
     def delete(self, documents):
         docs = []
@@ -31,4 +31,4 @@ class Documents(object):
                 docs.append(doc)
 
         data = {'value': docs}
-        return self.index.endpoint.post(endpoint=self.index.name+"/docs/index", data=data)
+        return self.index.endpoint.post(endpoint=self.index.name+"/docs/index", data=data, needs_admin=True)

@@ -35,40 +35,44 @@ class Endpoint(object):
         x.update({"api-version": self.api_version})
         return x
 
-    def query_headers(self, extra={}):
+    def query_headers(self, needs_admin=False, extra={}):
         x = copy.deepcopy(extra)
-        x.update({"api-key": self._azure_api_key})
+        if needs_admin:
+            key = self._azure_admin_api_key
+        else:
+            key = self._azure_api_key
+        x.update({"api-key": key})
         return x
-        
-    def get(self, data={}, endpoint=None):
+
+    def get(self, data={}, endpoint=None, needs_admin=False):
         return requests.get(
             self.query_path(endpoint),
             params=self.query_args(),
-            headers=self.query_headers(),
+            headers=self.query_headers(needs_admin),
             json = data
         )
 
-    def post(self, data={}, endpoint=None):
+    def post(self, data={}, endpoint=None, needs_admin=False):
         return requests.post(
             self.query_path(endpoint),
             params=self.query_args(),
-            headers=self.query_headers(),
+            headers=self.query_headers(needs_admin),
             json = data
         )
 
 
-    def put(self, data={}, endpoint=None):
+    def put(self, data={}, endpoint=None, needs_admin=False):
         return requests.put(
             self.query_path(endpoint),
             params=self.query_args(),
-            headers=self.query_headers(),
+            headers=self.query_headers(needs_admin),
             json = data
         )
 
-    def delete(self, data={}, endpoint=None):
+    def delete(self, data={}, endpoint=None, needs_admin=False):
         return requests.delete(
             self.query_path(endpoint),
             params=self.query_args(),
-            headers=self.query_headers(),
+            headers=self.query_headers(needs_admin),
             json = data
         )

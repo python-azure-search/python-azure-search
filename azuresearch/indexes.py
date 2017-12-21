@@ -146,18 +146,18 @@ class Index(object):
         return cls(name=data['name'], fields=[Field.load(f) for f in data['fields']])
 
     def create(self):
-        return self.endpoint.post(self.to_dict())
+        return self.endpoint.post(self.to_dict(), needs_admin=True)
 
     def update(self):
         self.delete()
         return self.create()
 
     def delete(self):
-        return self.endpoint.delete(endpoint=self.name)
+        return self.endpoint.delete(endpoint=self.name, needs_admin=True)
 
     @classmethod
     def list(cls):
-        return cls.endpoint.get()
+        return cls.endpoint.get(needs_admin=True)
 
     def search(self, query):
         query = {
@@ -165,9 +165,26 @@ class Index(object):
             "queryType": "full",  
             "searchMode": "all"  
         }
-        print(query)
         self.results = self.endpoint.post(query, endpoint=self.name+"/docs/search")
         return self.results
+
+    def statistics(self):
+        response = self.endpoint.get(endpoint=self.name+"/stats", needs_admin=True)
+        if response.status_code == 200:
+            self.recent_stats = response.json()
+            return self.recent_stats
+        else:
+            return response
+
+    def count(self):
+        # https://docs.microsoft.com/en-us/rest/api/searchservice/count-documents
+        response = self.endpoint.get(endpoint=self.name+"/docs/$count", needs_admin=True)
+        if response.status_code == 200:
+            response.encoding = "utf-8-sig"
+            self.recent_count = int(response.text)
+            return self.recent_count
+        else:
+            return response
 
 types = {
     "Edm.String": StringField, 
